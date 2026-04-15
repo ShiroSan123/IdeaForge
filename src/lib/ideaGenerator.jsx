@@ -262,10 +262,42 @@ function withDelay(value, delay = 250) {
 }
 
 /**
+ * @param {string} endpoint
+ * @param {Record<string, unknown>} payload
+ * @returns {Promise<any>}
+ */
+async function requestApi(endpoint, payload) {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.error || "API request failed");
+  }
+
+  return data;
+}
+
+/**
  * @param {GeneratorParams} params
  * @returns {Promise<Idea[]>}
  */
 export async function generateIdeas(params) {
+  try {
+    const data = await requestApi("/api/generate-ideas", params);
+    return Array.isArray(data.ideas) ? data.ideas : [];
+  } catch (error) {
+    if (!(error instanceof TypeError)) {
+      throw error;
+    }
+  }
+
   const baseParams = {
     level: params.level,
     goal: params.goal,
@@ -296,6 +328,23 @@ export async function generateRandomIdea() {
     /** @type {IdeaLevel[]} */ (Object.keys(DIFFICULTY_BY_LEVEL));
   const seed = Math.floor(Math.random() * 1000);
 
+  try {
+    const ideas = await generateIdeas({
+      level: levels[(seed + 2) % levels.length],
+      goal: goals[(seed + 1) % goals.length],
+      category: categories[seed % categories.length],
+      timeEstimate: TIME_OPTIONS[seed % TIME_OPTIONS.length],
+      stacks: [],
+      monetizable: seed % 2 === 0,
+    });
+
+    return ideas[0] || buildIdea({ seed });
+  } catch (error) {
+    if (!(error instanceof TypeError)) {
+      throw error;
+    }
+  }
+
   return withDelay(
     buildIdea({
       seed,
@@ -313,6 +362,18 @@ export async function generateRandomIdea() {
  * @returns {Promise<Idea[]>}
  */
 export async function generateFromPrompt(userPrompt) {
+  try {
+    const data = await requestApi("/api/generate-ideas", {
+      prompt: userPrompt,
+      count: 2,
+    });
+    return Array.isArray(data.ideas) ? data.ideas : [];
+  } catch (error) {
+    if (!(error instanceof TypeError)) {
+      throw error;
+    }
+  }
+
   const normalizedPrompt = userPrompt.trim();
 
   return withDelay(
@@ -338,6 +399,19 @@ export async function generateFromPrompt(userPrompt) {
  * @returns {Promise<StarterCode>}
  */
 export async function generateStarterCode(idea) {
+  try {
+    const data = await requestApi("/api/generate-code", idea);
+    return {
+      filename: data.filename || "IdeaApp.tsx",
+      code: data.code || "",
+      description: data.description || "",
+    };
+  } catch (error) {
+    if (!(error instanceof TypeError)) {
+      throw error;
+    }
+  }
+
   const componentName = idea.title.replace(/[^a-zA-Z0-9]/g, "") || "IdeaApp";
   const filename = `${componentName}.tsx`;
   const code = `import { useState } from "react";

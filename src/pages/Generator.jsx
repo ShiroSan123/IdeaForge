@@ -61,37 +61,62 @@ export default function Generator() {
   /** @param {GeneratorParams} params */
   const handleGenerate = async (params) => {
     setIsLoading(true);
-    const result = await generateIdeas(params);
-    setIdeas(
-      result.map(
-        /** @param {Idea} idea */
-        (idea) => ({ ...idea, is_favorite: false }),
-      ),
-    );
-    setIsLoading(false);
-    if (result.length > 0) toast.success(`Сгенерировано ${result.length} идей`);
+    try {
+      const result = await generateIdeas(params);
+      setIdeas(
+        result.map(
+          /** @param {Idea} idea */
+          (idea) => ({ ...idea, is_favorite: false }),
+        ),
+      );
+      if (result.length > 0) {
+        toast.success(`Сгенерировано ${result.length} идей`);
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Не удалось сгенерировать идеи",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRandom = async () => {
     setIsLoading(true);
-    const idea = await generateRandomIdea();
-    setIdeas([{ ...idea, is_favorite: false }]);
-    setIsLoading(false);
-    toast.success("Случайная идея готова!");
+    try {
+      const idea = await generateRandomIdea();
+      setIdeas([{ ...idea, is_favorite: false }]);
+      toast.success("Случайная идея готова");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Не удалось получить идею",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   /** @param {string} prompt */
   const handleAiGenerate = async (prompt) => {
     setIsLoading(true);
-    const result = await generateFromPrompt(prompt);
-    setIdeas(
-      result.map(
-        /** @param {Idea} idea */
-        (idea) => ({ ...idea, is_favorite: false }),
-      ),
-    );
-    setIsLoading(false);
-    if (result.length > 0) toast.success(`Сгенерировано ${result.length} идей`);
+    try {
+      const result = await generateFromPrompt(prompt);
+      setIdeas(
+        result.map(
+          /** @param {Idea} idea */
+          (idea) => ({ ...idea, is_favorite: false }),
+        ),
+      );
+      if (result.length > 0) {
+        toast.success(`Сгенерировано ${result.length} идей`);
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Не удалось обработать запрос",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   /** @param {Idea} idea */
@@ -160,15 +185,15 @@ export default function Generator() {
       >
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
           <Sparkles className="w-3 h-3" />
-          Генератор идей
+          AI-генератор идей
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
           Найди свой следующий
           <span className="text-primary"> проект</span>
         </h1>
         <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-          Настрой параметры или опиши идею. Приложение само соберет понятный
-          план проекта с архитектурой, задачами и стартовым кодом.
+          Настрой параметры или опиши идею, а AI подготовит набор проектов с
+          архитектурой, задачами и стартовым кодом.
         </p>
       </motion.div>
 
@@ -186,7 +211,7 @@ export default function Generator() {
             </TabsTrigger>
             <TabsTrigger value="ai" className="gap-2 text-sm">
               <Wand2 className="w-3.5 h-3.5" />
-              Свободный запрос
+              AI-запрос
             </TabsTrigger>
           </TabsList>
           <TabsContent value="form">
@@ -201,7 +226,7 @@ export default function Generator() {
           <TabsContent value="ai">
             <div className="rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm p-5 sm:p-6">
               <p className="text-sm text-muted-foreground mb-3">
-                Опишите своими словами, какой проект хотите собрать.
+                Опиши своими словами, какой проект хочешь собрать.
               </p>
               <AiPromptInput
                 onGenerate={handleAiGenerate}
@@ -217,18 +242,18 @@ export default function Generator() {
           {[1, 2, 3].map(
             /** @param {number} i */
             (i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-border/30 bg-card/30 p-5 animate-pulse"
-            >
-              <div className="h-5 bg-secondary/60 rounded w-3/4 mb-3" />
-              <div className="h-3 bg-secondary/40 rounded w-full mb-2" />
-              <div className="h-3 bg-secondary/40 rounded w-2/3 mb-4" />
-              <div className="flex gap-2">
-                <div className="h-5 bg-secondary/40 rounded w-16" />
-                <div className="h-5 bg-secondary/40 rounded w-20" />
+              <div
+                key={i}
+                className="rounded-xl border border-border/30 bg-card/30 p-5 animate-pulse"
+              >
+                <div className="h-5 bg-secondary/60 rounded w-3/4 mb-3" />
+                <div className="h-3 bg-secondary/40 rounded w-full mb-2" />
+                <div className="h-3 bg-secondary/40 rounded w-2/3 mb-4" />
+                <div className="flex gap-2">
+                  <div className="h-5 bg-secondary/40 rounded w-16" />
+                  <div className="h-5 bg-secondary/40 rounded w-20" />
+                </div>
               </div>
-            </div>
             ),
           )}
         </div>
@@ -273,9 +298,9 @@ export default function Generator() {
             <Sparkles className="w-7 h-7 text-primary animate-pulse-glow" />
           </div>
           <p className="text-muted-foreground text-sm">
-            Настройте параметры и нажмите "Сгенерировать"
+            Настрой параметры и нажми «Сгенерировать»
             <br />
-            или опишите идею в свободной форме
+            или опиши идею в свободной форме
           </p>
         </motion.div>
       )}

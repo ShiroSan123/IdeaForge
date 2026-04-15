@@ -119,9 +119,16 @@ export default function IdeaDetails({
 
   const handleGenerateCode = async () => {
     setLoadingCode(true);
-    const result = await generateStarterCode(idea);
-    setStarterCode(result);
-    setLoadingCode(false);
+    try {
+      const result = await generateStarterCode(idea);
+      setStarterCode(result);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Не удалось сгенерировать код",
+      );
+    } finally {
+      setLoadingCode(false);
+    }
   };
 
   const handleCopyCode = () => {
