@@ -1,0 +1,123 @@
+{
+  "name": "ProjectIdea",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief project description"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard",
+        "expert"
+      ],
+      "description": "Project difficulty level"
+    },
+    "technologies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Technologies used"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "web",
+        "mobile",
+        "desktop",
+        "ai",
+        "gamedev",
+        "devtools"
+      ],
+      "description": "Project type"
+    },
+    "time_estimate": {
+      "type": "string",
+      "enum": [
+        "1_day",
+        "1_week",
+        "2_weeks",
+        "1_month",
+        "3_months"
+      ],
+      "description": "Estimated time"
+    },
+    "monetizable": {
+      "type": "boolean",
+      "description": "Can be monetized"
+    },
+    "goal": {
+      "type": "string",
+      "enum": [
+        "portfolio",
+        "freelance",
+        "startup",
+        "learning"
+      ],
+      "description": "Project goal"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Main features"
+    },
+    "architecture": {
+      "type": "string",
+      "description": "Architecture example"
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Task breakdown"
+    },
+    "why_useful": {
+      "type": "string",
+      "description": "Why this idea is useful"
+    },
+    "what_youll_learn": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Skills to learn"
+    },
+    "is_favorite": {
+      "type": "boolean",
+      "default": false,
+      "description": "Saved to favorites"
+    },
+    "level": {
+      "type": "string",
+      "enum": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "description": "Target developer level"
+    }
+  },
+  "required": [
+    "title",
+    "description"
+  ]
+}
